@@ -1,6 +1,7 @@
-package org.example
+package com.github.ipanov.dotenv
 
 import java.nio.file.Path
+import java.nio.file.Paths
 import kotlin.io.path.inputStream
 
 fun Path.iterateLines(): Sequence<String> = sequence {
@@ -32,3 +33,5 @@ fun Path.iterateEnvPairs(): Sequence<Pair<String, String>> {
 }
 
 fun Path.loadEnvMap(): Map<String, String> = iterateEnvPairs().toMap()
+
+fun getCurrentDir(): Path = Paths.get("").toAbsolutePath()

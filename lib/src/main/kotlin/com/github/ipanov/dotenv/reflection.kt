@@ -1,4 +1,4 @@
-package org.example
+package com.github.ipanov.dotenv
 
 import java.nio.file.Path
 import kotlin.io.path.notExists

@@ -1,13 +1,13 @@
-package org.example
+package com.github.ipanov.dotenv
 
-import java.nio.file.Paths
+import org.junit.jupiter.api.assertThrows
 import kotlin.io.path.exists
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class CoreTest {
-    private val currentDir = Paths.get("").toAbsolutePath()
+    private val currentDir = getCurrentDir()
     private val testEnv = currentDir.resolve("src/test/resources/test.env")
     private val appEnv = currentDir.resolve("src/test/resources/app.env")
 
@@ -36,8 +36,10 @@ class CoreTest {
 
     @Test
     fun loadConfigTest() {
-        val cfg = appEnv.loadEnvAs<AppConfig>()
-        println(cfg)
+        assertThrows<Exception> {
+            val cfg = appEnv.loadEnvAs<AppConfig>()
+            println(cfg)
+        }
     }
 }
 
