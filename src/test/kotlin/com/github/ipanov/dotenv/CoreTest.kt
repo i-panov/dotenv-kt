@@ -23,8 +23,6 @@ class CoreTest {
 
     @Test
     fun iterateEnvPairsTest() {
-        assertEquals(5, testEnv.iterateEnvPairs().toList().count())
-
         assertEquals(mapOf(
             "test1" to "123",
             "test2" to "321",

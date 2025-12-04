@@ -11,16 +11,17 @@ import kotlin.reflect.jvm.jvmErasure
 @Target(AnnotationTarget.PROPERTY)
 annotation class EnvVal(val name: String = "")
 
-inline fun <reified T : Any> Path.loadEnvAs(): T = loadEnvAs(T::class)
+inline fun <reified T : Any> Path.loadEnvAs(crossinline onWarning: (String) -> Unit = {}): T = loadEnvAs(T::class) {
+    onWarning(it)
+}
 
 @Suppress("UNCHECKED_CAST")
-fun <T : Any> Path.loadEnvAs(kClass: KClass<T>): T {
+fun <T : Any> Path.loadEnvAs(kClass: KClass<T>, onWarning: (String) -> Unit = {}): T {
     if (notExists()) throw IllegalArgumentException("File not found: $this")
 
     val neededKeys = mutableSetOf<String>()
     val foundValues = mutableMapOf<String, String>()
 
-    // ЕДИНАЯ функция формирования ключа и префикса
     data class KeyInfo(val key: String, val nestedPrefix: String)
 
     fun keyInfo(param: KParameter, cls: KClass<*>, currentPrefix: String): KeyInfo {
@@ -46,7 +47,6 @@ fun <T : Any> Path.loadEnvAs(kClass: KClass<T>): T {
         }
     }
 
-    // 1. Сбор нужных ключей
     fun collectKeys(cls: KClass<*>, prefix: String) {
         val ctor = cls.primaryConstructor ?: return
         for (param in ctor.parameters) {
@@ -59,14 +59,6 @@ fun <T : Any> Path.loadEnvAs(kClass: KClass<T>): T {
         }
     }
 
-    // 2. Ленивое чтение
-    iterateEnvPairs().forEach { (k, v) ->
-        if (k in neededKeys && v.isNotEmpty()) {
-            foundValues[k] = v
-        }
-    }
-
-    // 3. Создание объектов
     fun build(cls: KClass<*>, prefix: String): Any {
         val ctor = cls.primaryConstructor!!
         val args = mutableMapOf<KParameter, Any?>()
@@ -79,13 +71,22 @@ fun <T : Any> Path.loadEnvAs(kClass: KClass<T>): T {
             } else if (info.key in foundValues) {
                 args[param] = foundValues[info.key]!!.toType(param.type)
             }
-            // иначе — дефолт или ошибка от Kotlin
         }
 
         return ctor.callBy(args)
     }
 
+    // 1. Сначала собираем ключи
     collectKeys(kClass, "")
+
+    // 2. Затем читаем файл (теперь neededKeys заполнен)
+    iterateEnvPairs(onWarning).forEach { (k, v) ->
+        if (k in neededKeys && v.isNotEmpty()) {
+            foundValues[k] = v
+        }
+    }
+
+    // 3. Создаём объект
     return build(kClass, "") as T
 }
 
