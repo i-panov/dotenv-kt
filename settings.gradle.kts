@@ -12,4 +12,3 @@ plugins {
 }
 
 rootProject.name = "dotenv-kt"
-include("lib")
