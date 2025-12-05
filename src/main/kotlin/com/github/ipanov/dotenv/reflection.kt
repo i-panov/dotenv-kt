@@ -98,7 +98,18 @@ private fun String.toType(type: KType): Any {
         Long::class -> toLong()
         Double::class -> toDouble()
         Float::class -> toFloat()
-        Boolean::class -> toBooleanStrict()
+        Boolean::class -> toBooleanSoft() ?: throw IllegalArgumentException("Unsupported boolean value: $this")
         else -> throw IllegalArgumentException("Unsupported type: $classifier")
     }
 }
+
+fun String.toBooleanSoft(): Boolean? {
+    return when (this.lowercase()) {
+        in TRUE_VALUES -> true
+        in FALSE_VALUES -> false
+        else -> null
+    }
+}
+
+private val TRUE_VALUES = setOf("true", "1", "yes", "y", "on")
+private val FALSE_VALUES = setOf("false", "0", "no", "n", "off")
