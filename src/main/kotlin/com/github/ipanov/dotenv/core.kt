@@ -1,12 +1,19 @@
 package com.github.ipanov.dotenv
 
+import java.io.InputStream
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.inputStream
 
-fun Path.iterateLines(): Sequence<String> = sequence {
-    inputStream().bufferedReader().use { reader ->
+fun InputStream.iterateLines(): Sequence<String> = sequence {
+    bufferedReader().use { reader ->
         yieldAll(reader.lineSequence())
+    }
+}
+
+fun Path.iterateLines(): Sequence<String> = sequence {
+    inputStream().use {
+        yieldAll(it.iterateLines())
     }
 }
 
@@ -57,7 +64,7 @@ private enum class State { KEY, AFTER_KEY, VALUE_START, VALUE_UNQUOTED, VALUE_QU
  * Парсинг одной строки .env файла
  * Возвращает null если строка пустая, комментарий или невалидная
  */
-fun parseEnvLine(line: String, onWarning: (String) -> Unit = {}): Pair<String, String>? {
+private fun parseEnvLine(line: String, onWarning: (String) -> Unit = {}): Pair<String, String>? {
     val trimmed = line.trim()
 
     // Пустая строка или комментарий

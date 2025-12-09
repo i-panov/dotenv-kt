@@ -16,21 +16,44 @@
 
 ### JitPack
 
-1. Добавьте JitPack в список репозиториев в `settings.gradle.kts`:
+1. Добавьте репозиторий JitPack в `build.gradle.kts` (или в `settings.gradle.kts`, если используете):
 
 ```kotlin
-dependencyResolutionManagement {
-    repositories {
-        maven { url "https://jitpack.io" }
-    }
+repositories {
+    mavenCentral()
+    maven(url = uri("https://jitpack.io"))
 }
 ```
 
-2. Добавьте зависимость в `build.gradle.kts`:
+> Этот шаг необходим для обоих способов подключения.
+
+#### Способ 1: Прямая зависимость
+
+Добавьте зависимость напрямую:
 
 ```kotlin
 dependencies {
     implementation("com.github.i-panov:dotenv-kt:1.0.0")
+}
+```
+
+#### Способ 2: Через libs.versions.toml
+
+1. Добавьте зависимость в `gradle/libs.versions.toml`:
+
+```toml
+[versions]
+dotenv-kt = "1.0.0"
+
+[libraries]
+dotenv-kt = { group = "com.github.i-panov", name = "dotenv-kt", version.ref = "dotenv-kt" }
+```
+
+2. Используйте зависимость в `build.gradle.kts`:
+
+```kotlin
+dependencies {
+    implementation(libs.dotenv.kt)
 }
 ```
 

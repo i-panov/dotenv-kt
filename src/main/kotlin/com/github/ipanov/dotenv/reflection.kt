@@ -93,6 +93,7 @@ fun <T : Any> Path.loadEnvAs(kClass: KClass<T>, onWarning: (String) -> Unit = {}
 private fun String.toType(type: KType): Any {
     val classifier = type.withNullability(false).classifier!!
     return when (classifier) {
+        Char::class -> single()
         String::class -> this
         Int::class -> toInt()
         Long::class -> toLong()
