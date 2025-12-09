@@ -3,7 +3,7 @@ package com.github.ipanov.dotenv
 import java.io.InputStream
 import java.nio.file.Path
 import java.nio.file.Paths
-import kotlin.io.path.inputStream
+import kotlin.io.path.*
 
 fun InputStream.iterateLines(): Sequence<String> = sequence {
     bufferedReader().use { reader ->
@@ -12,6 +12,11 @@ fun InputStream.iterateLines(): Sequence<String> = sequence {
 }
 
 fun Path.iterateLines(): Sequence<String> = sequence {
+    if (notExists()) throw IllegalArgumentException("File not found: $this")
+    if (!isRegularFile()) throw IllegalArgumentException("Not a file: $this")
+    if (!isReadable()) throw IllegalArgumentException("File is not readable: $this")
+    if (fileSize() == 0L) throw IllegalArgumentException("File is empty: $this")
+
     inputStream().use {
         yieldAll(it.iterateLines())
     }

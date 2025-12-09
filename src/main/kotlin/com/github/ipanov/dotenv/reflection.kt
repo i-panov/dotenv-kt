@@ -1,10 +1,7 @@
 package com.github.ipanov.dotenv
 
 import java.nio.file.Path
-import kotlin.io.path.notExists
-import kotlin.reflect.KClass
-import kotlin.reflect.KParameter
-import kotlin.reflect.KType
+import kotlin.reflect.*
 import kotlin.reflect.full.*
 import kotlin.reflect.jvm.jvmErasure
 
@@ -17,8 +14,6 @@ inline fun <reified T : Any> Path.loadEnvAs(crossinline onWarning: (String) -> U
 
 @Suppress("UNCHECKED_CAST")
 fun <T : Any> Path.loadEnvAs(kClass: KClass<T>, onWarning: (String) -> Unit = {}): T {
-    if (notExists()) throw IllegalArgumentException("File not found: $this")
-
     val neededKeys = mutableSetOf<String>()
     val foundValues = mutableMapOf<String, String>()
 
