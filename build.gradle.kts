@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.github.i-panov"
-version = "1.0.0-SNAPSHOT"
+version = "1.0.6"
 description = "A simple and lightweight Kotlin library for working with .env files with automatic object mapping."
 
 
